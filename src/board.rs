@@ -77,7 +77,7 @@ impl Board {
         });
     }
 
-    pub fn turn(&mut self) {
+    pub fn rotate(&mut self) {
         let squares = self.squares.clone();
 
         for index in 0..64 {

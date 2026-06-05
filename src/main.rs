@@ -5,7 +5,7 @@ pub mod rules;
 pub mod render;
 
 use crate::board::Board;
-use crate::pieces::{Color, Square};
+use crate::pieces::Square;
 use crate::render::Renderer;
 use crate::render::board::{SCREEN_HEIGHT, SCREEN_WIDTH, SQUARE_SIZE};
 use crate::render::input::{InputState, draw_highlights, draw_win};
@@ -25,7 +25,6 @@ async fn main() {
     let renderer = Renderer::new(&texture);
 
     let mut board = Board::new();
-    let mut turn = Color::White;
     let mut state = InputState::empty();
 
     loop {
@@ -43,7 +42,7 @@ async fn main() {
             match state.position {
                 None => {
                     if let Square::Occupied(piece) = board.squares[position] &&
-                       piece.color == turn
+                       piece.color == board.turn
                     {
                         let legal_moves = generate_legal_moves(&board)
                             .into_iter()
@@ -60,12 +59,11 @@ async fn main() {
                                            .cloned()
                     {
                         board.make_move(&mv);
-                        turn = turn.opposite();
-                        board.turn();
+                        board.rotate();
                         state = InputState::empty();
                     } else {
                         match board.squares[position] {
-                            Square::Occupied(piece) if piece.color == turn => {
+                            Square::Occupied(piece) if piece.color == board.turn => {
                                 let legal_moves = generate_legal_moves(&board)
                                                   .into_iter()
                                                   .filter(|m| m.from == position)
@@ -98,8 +96,8 @@ async fn main() {
             );
         }
 
-        if board.is_in_check(turn) {
-            let (king_square, pos) = board.king_square(turn);
+        if board.is_in_check(board.turn) {
+            let (king_square, pos) = board.king_square(board.turn);
             let rank = pos / 8;
             let file = pos % 8;
 
@@ -111,10 +109,12 @@ async fn main() {
                 RED
             );
 
-            let any_move = generate_legal_moves(&board).len() > 0;
+            let king_has_move = generate_legal_moves(&board)
+                                       .into_iter()
+                                       .any(|m| m.from == pos);
 
-            if !any_move {
-                draw_win(turn.opposite());
+            if !king_has_move {
+                draw_win(board.turn.opposite());
             }
         }
 
