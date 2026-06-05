@@ -18,8 +18,8 @@ To build and run this project, you need to have Rust and Cargo installed on your
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/chess-rust.git
-   cd chess-rust
+   git clone https://github.com/0xbarss/simple-chess.git
+   cd simple-chess
    ```
 
 2. Build the project:
