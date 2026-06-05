@@ -29,32 +29,19 @@ impl InputState {
 }
 
 pub fn draw_highlights(rank: u32, file: u32, selected: Option<Square>, legal_moves: &Vec<Move>, color: Color) {
-    if let Some(square) = selected {
+    if let Some(_) = selected {
         let x = file as f32 * SQUARE_SIZE;
         let y = (7.0 - rank as f32) * SQUARE_SIZE;
-        match square {
-            Square::Occupied(_) => {
-                draw_rectangle_lines(
-                    x,
-                    y,
-                    SQUARE_SIZE,
-                    SQUARE_SIZE,
-                    10.0,
-                    color
-                );
-            },
-            Square::Empty(_) => {
-                draw_rectangle_lines(
-                    x,
-                    y,
-                    SQUARE_SIZE,
-                    SQUARE_SIZE,
-                    10.0,
-                    color
-                );
-            }
-        }
+        draw_rectangle_lines(
+            x,
+            y,
+            SQUARE_SIZE,
+            SQUARE_SIZE,
+            10.0,
+            color
+        );
     }
+
     for mv in legal_moves {
         if mv.from == (file as usize + rank as usize * 8) {
             let x = mv.to % 8;
