@@ -27,104 +27,125 @@ pub fn generate_pseudo_moves(board: &Board) -> Vec<Move> {
             match piece.kind {
                 PieceKind::Pawn => {
                     let current_color = piece.color;
+                    let is_bottom = board.turn == current_color;
 
-                    let pawn_dirs = [7, 8, 9, 16];
+                    let pawn_dirs: [i32; 4] = if is_bottom { [7, 8, 9, 16] } else { [-7, -8, -9, -16] };
 
                     for dir in pawn_dirs {
-                        if let Some(pos) = index.checked_add_signed(dir) {
-                            if pos >= 64 {
-                                continue;
-                            }
+                        let Some(pos) = index.checked_add_signed(dir as isize) else { continue};
+                        if pos >= 64 {
+                            continue;
+                        }
 
-                            let current_rank = index / 8;
-                            let target_rank = pos / 8;
+                        let current_rank = index / 8;
+                        let target_rank = pos / 8;
 
-                            match squares[pos as usize] {
+                        match squares[pos as usize] {
+                            Square::Empty(_) => {
                                 // DoublePawnPush
-                                Square::Empty(_) => {
-                                    if dir % 16 == 0 && current_rank == 1 {
-                                        if let Some(half) = index.checked_add_signed(dir / 2) &&
-                                            let Square::Empty(_) = squares[half as usize]
-                                        {
-                                            moves.push(Move {
-                                                from: index,
-                                                to: pos,
-                                                flag: MoveFlag::DoublePawnPush
-                                            });
-                                        }
-                                    }
-                                    // Promotion
-                                    else if (dir % 8 == 0) && target_rank == 7 {
-                                        if let Square::Empty(_) = squares[pos as usize] {
-                                            moves.push(Move {
-                                                from: index,
-                                                to: pos,
-                                                flag: MoveFlag::Promotion(PieceKind::Queen)
-                                            });
-                                            moves.push(Move {
-                                                from: index,
-                                                to: pos,
-                                                flag: MoveFlag::Promotion(PieceKind::Rook)
-                                            });
-                                            moves.push(Move {
-                                                from: index,
-                                                to: pos,
-                                                flag: MoveFlag::Promotion(PieceKind::Bishop)
-                                            });
-                                            moves.push(Move {
-                                                from: index,
-                                                to: pos,
-                                                flag: MoveFlag::Promotion(PieceKind::Knight)
-                                            });
-                                        }
-                                    }
-                                    // Quiet
-                                    else if dir.abs() == 8 {
-                                        if let Square::Empty(_) = squares[pos as usize] {
-                                            moves.push(Move {
-                                                from: index,
-                                                to: pos,
-                                                flag: MoveFlag::Quiet
-                                            });
-                                        }
-                                    }
-                                    // En Passant
-                                    else if dir % 8 != 0 {
-                                        if index >= 64 || board.en_passant < 0 { continue }
-                                        if current_rank != 4 { continue }
-                                        let en_passant_index = board.en_passant as usize;
-                                        let shadow = en_passant_index + 8;
-                                        if let Some(prev_pos) = index.checked_add_signed(-1) &&
-                                           en_passant_index == prev_pos &&
-                                           pos == shadow
-                                        {
-                                            moves.push(Move {
-                                                from: index,
-                                                to: pos,
-                                                flag: MoveFlag::EnPassant
-                                            });
-                                        }
-                                        else if en_passant_index == index + 1 &&
-                                            pos == shadow
-                                        {
-                                            moves.push(Move {
-                                                from: index,
-                                                to: pos,
-                                                flag: MoveFlag::EnPassant
-                                            });
-                                        }
-                                    }
-                                },
-                                // Capture
-                                Square::Occupied(piece) => {
-                                    if (dir % 8 != 0) && (piece.color != current_color) {
+                                if dir.abs() == 16 && ((is_bottom && current_rank == 1) || (!is_bottom && current_rank == 6)) {
+                                    if let Some(half) = index.checked_add_signed(dir as isize) &&
+                                        let Square::Empty(_) = squares[half as usize]
+                                    {
                                         moves.push(Move {
                                             from: index,
                                             to: pos,
-                                            flag: MoveFlag::Capture
+                                            flag: MoveFlag::DoublePawnPush
                                         });
                                     }
                                 }
+                                // Promotion
+                                else if (dir == 8 && target_rank == 7) || (dir == -8 && target_rank == 0) {
+                                    if let Square::Empty(_) = squares[pos as usize] {
+                                        moves.push(Move {
+                                            from: index,
+                                            to: pos,
+                                            flag: MoveFlag::Promotion(PieceKind::Queen)
+                                        });
+                                        moves.push(Move {
+                                            from: index,
+                                            to: pos,
+                                            flag: MoveFlag::Promotion(PieceKind::Rook)
+                                        });
+                                        moves.push(Move {
+                                            from: index,
+                                            to: pos,
+                                            flag: MoveFlag::Promotion(PieceKind::Bishop)
+                                        });
+                                        moves.push(Move {
+                                            from: index,
+                                            to: pos,
+                                            flag: MoveFlag::Promotion(PieceKind::Knight)
+                                        });
+                                    }
+                                }
+                                // Quiet
+                                else if dir.abs() == 8 {
+                                    if let Square::Empty(_) = squares[pos as usize] {
+                                        moves.push(Move {
+                                            from: index,
+                                            to: pos,
+                                            flag: MoveFlag::Quiet
+                                        });
+                                    }
+                                }
+                                // En Passant
+                                else if dir.abs() % 8 != 0 && board.en_passant >= 0 && current_rank == 4 {
+                                    let en_passant_index = board.en_passant as usize;
+                                    if let Some(prev_pos) = index.checked_add_signed(-1) &&
+                                        en_passant_index == prev_pos &&
+                                        pos == en_passant_index + 8
+                                    {
+                                        moves.push(Move {
+                                            from: index,
+                                            to: pos,
+                                            flag: MoveFlag::EnPassant
+                                        });
+                                    }
+                                    else if en_passant_index == index + 1 &&
+                                        pos == en_passant_index + 8
+                                    {
+                                        moves.push(Move {
+                                            from: index,
+                                            to: pos,
+                                            flag: MoveFlag::EnPassant
+                                        });
+                                    }
+                                }
+                            },
+                            Square::Occupied(piece) => {
+                                if dir % 8 == 0 || piece.color == current_color { continue };
+                                // Promotion
+                                if target_rank == 7 {
+                                    moves.push(Move {
+                                        from: index,
+                                        to: pos,
+                                        flag: MoveFlag::Promotion(PieceKind::Queen)
+                                    });
+                                    moves.push(Move {
+                                        from: index,
+                                        to: pos,
+                                        flag: MoveFlag::Promotion(PieceKind::Rook)
+                                    });
+                                    moves.push(Move {
+                                        from: index,
+                                        to: pos,
+                                        flag: MoveFlag::Promotion(PieceKind::Bishop)
+                                    });
+                                    moves.push(Move {
+                                        from: index,
+                                        to: pos,
+                                        flag: MoveFlag::Promotion(PieceKind::Knight)
+                                    });
+                                }
+                                // Capture
+                                else {
+                                    moves.push(Move {
+                                        from: index,
+                                        to: pos,
+                                        flag: MoveFlag::Capture
+                                    });
+                                };
                             }
                         }
                     }
@@ -365,8 +386,8 @@ pub fn generate_pseudo_moves(board: &Board) -> Vec<Move> {
                                     // No Check / No Threats to areas between king and rook
                                     if dir == 2 && index == 4 {
                                         if let Square::Occupied(piece) = squares[7] &&
-                                            let Square::Empty(_) = squares[5] &&
-                                            piece.kind == PieceKind::Rook
+                                           let Square::Empty(_) = squares[5] &&
+                                           piece.kind == PieceKind::Rook
                                         {
                                             moves.push(Move {
                                                 from: index,

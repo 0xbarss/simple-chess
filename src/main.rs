@@ -111,9 +111,7 @@ async fn main() {
                 RED
             );
 
-            let any_move = generate_legal_moves(&board)
-                           .into_iter()
-                           .any(|m| m.from == pos);
+            let any_move = generate_legal_moves(&board).len() > 0;
 
             if !any_move {
                 draw_win(turn.opposite());

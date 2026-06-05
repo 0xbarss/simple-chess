@@ -25,6 +25,9 @@ impl Board {
         let from = mv.from;
         let to = mv.to;
 
+        let old_en_passant = self.en_passant;
+        self.en_passant = -1;
+
         match mv.flag {
             MoveFlag::Quiet => {
                 self.squares[to] = self.squares[from];
@@ -33,9 +36,10 @@ impl Board {
             MoveFlag::DoublePawnPush => {
                 self.squares[to] = self.squares[from];
                 self.squares[from] = Square::Empty(from);
+                self.en_passant = to as i8;
             }
             MoveFlag::EnPassant => {
-                let en_passant_index = self.en_passant as usize;
+                let en_passant_index = old_en_passant as usize;
                 self.squares[en_passant_index] = Square::Empty(en_passant_index);
                 self.squares[to] = self.squares[from];
                 self.squares[from] = Square::Empty(from);
@@ -75,8 +79,8 @@ impl Board {
     }
 
     pub fn is_in_check(&self, color: Color) -> bool {
-        let (king, index) = self.king_square(color);
-        self.square_attacked(king, index, color.opposite())
+        let (_, index) = self.king_square(color);
+        self.square_attacked(index, color.opposite())
     }
 
     pub fn king_square(&self, color: Color) -> (Square, usize) {
@@ -93,7 +97,6 @@ impl Board {
 
     fn square_attacked(
         &self,
-        _target: Square,
         target_index: usize,
         attacker: Color,
     ) -> bool {

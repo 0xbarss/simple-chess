@@ -5,7 +5,8 @@ use crate::pieces::{Color, PieceKind, Piece, Square};
 #[derive(Debug, Clone, Copy)]
 pub struct Board {
     pub squares: [Square; 64],
-    pub en_passant: i8
+    pub en_passant: i8,
+    pub turn: Color
 }
 
 impl Board {
@@ -54,14 +55,14 @@ impl Board {
             }
         );
 
-        Board { squares, en_passant: -1 }
+        Board { squares, en_passant: -1, turn: Color::White }
     }
 }
 
 impl Board {
     pub fn empty() -> Self {
         let squares = from_fn(|i| Square::Empty(i));
-        Board { squares, en_passant: -1 }
+        Board { squares, en_passant: -1, turn: Color::White }
     }
 
     pub fn place_piece(
@@ -76,21 +77,6 @@ impl Board {
         });
     }
 
-    pub fn with_piece_in_(
-        index: u8,
-        color: Color,
-        kind: PieceKind,
-    ) -> Self {
-        let mut squares = from_fn(|i| Square::Empty(i));
-
-        squares[index as usize] = Square::Occupied(Piece {
-            color,
-            kind,
-        });
-
-        Board { squares, en_passant: -1 }
-    }
-
     pub fn turn(&mut self) {
         let squares = self.squares.clone();
 
@@ -101,5 +87,14 @@ impl Board {
             let new_index = new_file + new_rank * 8;
             self.squares[new_index] = square;
         }
+
+        if self.en_passant >= 0 {
+            let ep_index = self.en_passant as usize;
+            let new_rank = 7 - ep_index / 8;
+            let new_file = ep_index % 8;
+            self.en_passant = (new_file + new_rank * 8) as i8;
+        }
+
+        self.turn = self.turn.opposite();
     }
 }
