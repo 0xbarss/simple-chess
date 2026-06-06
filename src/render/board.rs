@@ -15,9 +15,10 @@ const DARK_COLOR: Color = Color::from_rgba(181, 136, 99, 255);
 
 impl Renderer<'_> {
     pub fn draw_board(&self, turn: PieceColor) {
+        let bottom_offset = if turn == PieceColor::White { 0 } else { 1 };
         for x in 0..8 {
             for y in 0..8 {
-                let is_light = if turn == PieceColor::White { (x + y) % 2 == 0 } else { (x + y) % 2 == 1 };
+                let is_light = (x + y) % 2 == bottom_offset;
                 let color = if is_light { LIGHT_COLOR } else { DARK_COLOR };
 
                 draw_rectangle(
@@ -32,7 +33,7 @@ impl Renderer<'_> {
 
         let ranks = ["a", "b", "c", "d", "e", "f", "g", "h"];
         for index in 0..8 {
-            let color = if index % 2 == 0 { LIGHT_COLOR } else { DARK_COLOR };
+            let color = if index % 2 == bottom_offset { LIGHT_COLOR } else { DARK_COLOR };
 
             draw_text(
                 ranks[index],
@@ -45,10 +46,11 @@ impl Renderer<'_> {
 
         let files = ["1", "2", "3", "4", "5", "6", "7", "8"];
         for index in 0..8 {
-            let color = if index % 2 == 1 { LIGHT_COLOR } else { DARK_COLOR };
+            let display_index = if bottom_offset == 1 { index } else { 7-index };
+            let color = if (index + 1) % 2 == bottom_offset { LIGHT_COLOR } else { DARK_COLOR };
 
             draw_text(
-                files[index],
+                files[display_index],
                 SCREEN_WIDTH - SQUARE_SIZE / 8.0,
                 SCREEN_HEIGHT - 7.0 * SQUARE_SIZE / 8.0 - SQUARE_SIZE * index as f32,
                 16.0,
