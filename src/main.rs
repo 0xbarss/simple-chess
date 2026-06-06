@@ -24,7 +24,7 @@ async fn main() {
     let texture = load_texture("assets/tileset_64.png").await.unwrap();
     let renderer = Renderer::new(&texture);
 
-    let mut board = Board::new();
+    let mut board = Board::default();
     let mut state = InputState::empty();
 
     loop {

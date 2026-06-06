@@ -31,11 +31,11 @@ impl Renderer<'_> {
         }
 
         let ranks = ["a", "b", "c", "d", "e", "f", "g", "h"];
-        for index in 0..8 {
+        for (index, rank) in ranks.iter().enumerate() {
             let color = if index % 2 == bottom_offset { LIGHT_COLOR } else { DARK_COLOR };
 
             draw_text(
-                ranks[index],
+                rank,
                 SQUARE_SIZE / 16.0 + SQUARE_SIZE * index as f32,
                 SCREEN_HEIGHT - SQUARE_SIZE / 16.0,
                 16.0,

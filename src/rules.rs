@@ -7,7 +7,7 @@ pub fn generate_legal_moves(board: &Board) -> Vec<Move> {
     let mut legal_moves = vec![];
 
     for mv in moves {
-        let played_square = board.squares[mv.from as usize];
+        let played_square = board.squares[mv.from];
         if let Square::Occupied(square) = played_square {
             if matches!(mv.flag, MoveFlag::CastleKingside | MoveFlag::CastleQueenside) {
                 if board.is_in_check(square.color) {
@@ -25,7 +25,7 @@ pub fn generate_legal_moves(board: &Board) -> Vec<Move> {
                 }
             }
 
-            let mut board_test = board.clone();
+            let mut board_test = *board;
             board_test.make_move(&mv);
             if !board_test.is_in_check(square.color) {
                 legal_moves.push(mv);
@@ -117,10 +117,9 @@ impl Board {
     pub fn king_square(&self, color: Color) -> (Square, usize) {
         for index in 0..64 {
             let square = self.squares[index];
-            if let Square::Occupied(piece) = square {
-                if piece.kind == PieceKind::King && piece.color == color {
-                    return (square, index);
-                }
+            if let Square::Occupied(piece) = square &&
+               piece.kind == PieceKind::King && piece.color == color {
+                   return (square, index);
             }
         }
         panic!("King is not found!")
@@ -135,20 +134,17 @@ impl Board {
         let pawn_attack_dirs = if is_bottom { [7, 9] } else { [-7, -9] };
 
         for dir in pawn_attack_dirs {
-            if let Some(pos) = target_index.checked_add_signed(-(dir as isize)) {
-                if pos < 64 {
-                    let current_rank = pos / 8;
-                    let target_rank = target_index / 8;
-                    let current_file = pos % 8;
-                    let target_file = target_index % 8;
+            if let Some(pos) = target_index.checked_add_signed(-(dir as isize)) && pos < 64 {
+                let current_rank = pos / 8;
+                let target_rank = target_index / 8;
+                let current_file = pos % 8;
+                let target_file = target_index % 8;
 
-                    if current_rank.abs_diff(target_rank) == 1 && current_file.abs_diff(target_file) == 1 {
-                        if let Square::Occupied(piece) = self.squares[pos] {
-                            if piece.kind == PieceKind::Pawn && piece.color == attacker {
-                                return true;
-                            }
-                        }
-                    }
+                if current_rank.abs_diff(target_rank) == 1 &&
+                   current_file.abs_diff(target_file) == 1 &&
+                   let Square::Occupied(piece) = self.squares[pos] &&
+                   piece.kind == PieceKind::Pawn && piece.color == attacker {
+                        return true;
                 }
             }
         }

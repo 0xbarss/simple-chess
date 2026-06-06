@@ -11,7 +11,7 @@ pub struct Renderer<'a> {
 impl Renderer<'_> {
     pub fn new(texture: &Texture2D) -> Renderer<'_> {
         Renderer {
-            texture: texture
+            texture
         }
     }
 }

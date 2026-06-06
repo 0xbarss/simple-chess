@@ -29,7 +29,7 @@ impl InputState {
 }
 
 pub fn draw_highlights(rank: u32, file: u32, selected: Option<Square>, legal_moves: &Vec<Move>, color: Color) {
-    if let Some(_) = selected {
+    if selected.is_some() {
         let x = file as f32 * SQUARE_SIZE;
         let y = (7.0 - rank as f32) * SQUARE_SIZE;
         draw_rectangle_lines(

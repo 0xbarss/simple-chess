@@ -10,44 +10,44 @@ pub struct Board {
     pub castle_rights: [bool; 4], // [CurrentKingside, CurrentQueenside, OpponentKingside, OpponentQueenside]
 }
 
-impl Board {
-    pub fn new() -> Self {
+impl Default for Board {
+    fn default() -> Self {
         let squares: [Square; 64] = from_fn(
             |i| {
                 let color = if i < 32 { Color::White } else { Color::Black };
                 if (i > 7 && i < 16) || (i > 47 && i < 56) {
                     return Square::Occupied(Piece {
-                        color: color,
+                        color,
                         kind: PieceKind::Pawn
                     });
                 }
                 else if i == 0 || i == 7 || i == 56 || i == 63 {
                     return Square::Occupied(Piece {
-                        color: color,
+                        color,
                         kind: PieceKind::Rook
                     });
                 }
                 else if i == 1 || i == 6 || i == 57 || i == 62 {
                     return Square::Occupied(Piece {
-                        color: color,
+                        color,
                         kind: PieceKind::Knight
                     });
                 }
                 else if i == 2 || i == 5 || i == 58 || i == 61 {
                     return Square::Occupied(Piece {
-                        color: color,
+                        color,
                         kind: PieceKind::Bishop
                     });
                 }
                 else if i == 3 || i == 59 {
                     return Square::Occupied(Piece {
-                        color: color,
+                        color,
                         kind: PieceKind::Queen
                     });
                 }
                 else if i == 4 || i == 60 {
                     return Square::Occupied(Piece {
-                        color: color,
+                        color,
                         kind: PieceKind::King
                     });
                 }
@@ -66,8 +66,8 @@ impl Board {
 }
 
 impl Board {
-    pub fn empty() -> Self {
-        let squares = from_fn(|i| Square::Empty(i));
+    pub fn empty() -> Board {
+        let squares = from_fn(Square::Empty);
         Board {
             squares,
             en_passant: -1,
@@ -89,14 +89,13 @@ impl Board {
     }
 
     pub fn rotate(&mut self) {
-        let squares = self.squares.clone();
+        let squares = self.squares;
 
-        for index in 0..64 {
-            let square = squares[index];
+        for (index, square) in squares.iter().enumerate() {
             let new_rank = 7 - index / 8;
             let new_file = index % 8;
             let new_index = new_file + new_rank * 8;
-            self.squares[new_index] = square;
+            self.squares[new_index] = *square;
         }
 
         if self.en_passant >= 0 {

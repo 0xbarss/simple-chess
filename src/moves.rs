@@ -40,12 +40,12 @@ pub fn generate_pseudo_moves(board: &Board) -> Vec<Move> {
                         let current_rank = index / 8;
                         let target_rank = pos / 8;
 
-                        match squares[pos as usize] {
+                        match squares[pos] {
                             Square::Empty(_) => {
                                 // DoublePawnPush
                                 if dir.abs() == 16 && ((is_bottom && current_rank == 1) || (!is_bottom && current_rank == 6)) {
                                     if let Some(half) = index.checked_add_signed(dir as isize) &&
-                                        let Square::Empty(_) = squares[half as usize]
+                                        let Square::Empty(_) = squares[half]
                                     {
                                         moves.push(Move {
                                             from: index,
@@ -56,7 +56,7 @@ pub fn generate_pseudo_moves(board: &Board) -> Vec<Move> {
                                 }
                                 // Promotion
                                 else if (dir == 8 && target_rank == 7) || (dir == -8 && target_rank == 0) {
-                                    if let Square::Empty(_) = squares[pos as usize] {
+                                    if let Square::Empty(_) = squares[pos] {
                                         moves.push(Move {
                                             from: index,
                                             to: pos,
@@ -81,7 +81,7 @@ pub fn generate_pseudo_moves(board: &Board) -> Vec<Move> {
                                 }
                                 // Quiet
                                 else if dir.abs() == 8 {
-                                    if let Square::Empty(_) = squares[pos as usize] {
+                                    if let Square::Empty(_) = squares[pos] {
                                         moves.push(Move {
                                             from: index,
                                             to: pos,
@@ -166,7 +166,7 @@ pub fn generate_pseudo_moves(board: &Board) -> Vec<Move> {
                             if (dir == 1 || dir == -1) && (pos / 8 != next / 8) {
                                 break;
                             }
-                            match squares[next as usize] {
+                            match squares[next] {
                                 Square::Empty(_) => {
                                     moves.push(Move {
                                         from: index,
@@ -217,7 +217,7 @@ pub fn generate_pseudo_moves(board: &Board) -> Vec<Move> {
                                  continue;
                              }
 
-                             match squares[pos as usize] {
+                             match squares[pos] {
                                  Square::Empty(_) => {
                                      moves.push(Move {
                                          from: index,
@@ -256,7 +256,7 @@ pub fn generate_pseudo_moves(board: &Board) -> Vec<Move> {
                             {
                                 break;
                             }
-                            match squares[next as usize] {
+                            match squares[next] {
                                 Square::Empty(_) => {
                                     moves.push(Move {
                                         from: index,
@@ -296,7 +296,7 @@ pub fn generate_pseudo_moves(board: &Board) -> Vec<Move> {
                             if (dir == 1 || dir == -1) && (pos / 8 != next / 8) {
                                 break;
                             }
-                            match squares[next as usize] {
+                            match squares[next] {
                                 Square::Empty(_) => {
                                     moves.push(Move {
                                         from: index,
@@ -331,7 +331,7 @@ pub fn generate_pseudo_moves(board: &Board) -> Vec<Move> {
                             {
                                 break;
                             }
-                            match squares[next as usize] {
+                            match squares[next] {
                                 Square::Empty(_) => {
                                     moves.push(Move {
                                         from: index,
@@ -378,7 +378,7 @@ pub fn generate_pseudo_moves(board: &Board) -> Vec<Move> {
                                 continue;
                             }
 
-                            match squares[pos as usize] {
+                            match squares[pos] {
                                 Square::Empty(_) => {
                                     // Kingside Castle
                                     if dir == 2 && index == 4 && board.castle_rights[0] {
