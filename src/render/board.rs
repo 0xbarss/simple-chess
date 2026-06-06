@@ -3,7 +3,6 @@ use macroquad::shapes::draw_rectangle;
 use macroquad::text::draw_text;
 
 use crate::pieces::Color as PieceColor;
-
 use super::Renderer;
 
 pub const SQUARE_SIZE: f32 = 100.0;
@@ -46,7 +45,7 @@ impl Renderer<'_> {
 
         let files = ["1", "2", "3", "4", "5", "6", "7", "8"];
         for index in 0..8 {
-            let display_index = if bottom_offset == 1 { index } else { 7-index };
+            let display_index = if bottom_offset == 0 { index } else { 7-index };
             let color = if (index + 1) % 2 == bottom_offset { LIGHT_COLOR } else { DARK_COLOR };
 
             draw_text(
