@@ -5,8 +5,9 @@ use crate::pieces::{Color, PieceKind, Piece, Square};
 #[derive(Debug, Clone, Copy)]
 pub struct Board {
     pub squares: [Square; 64],
-    pub en_passant: i8,
-    pub turn: Color
+    pub en_passant: i8, // -1: None | pos: <Square>
+    pub turn: Color,
+    pub castle_rights: [bool; 4], // [CurrentKingside, CurrentQueenside, OpponentKingside, OpponentQueenside]
 }
 
 impl Board {
@@ -55,14 +56,24 @@ impl Board {
             }
         );
 
-        Board { squares, en_passant: -1, turn: Color::White }
+        Board {
+            squares,
+            en_passant: -1,
+            turn: Color::White,
+            castle_rights: [true, true, true, true],
+        }
     }
 }
 
 impl Board {
     pub fn empty() -> Self {
         let squares = from_fn(|i| Square::Empty(i));
-        Board { squares, en_passant: -1, turn: Color::White }
+        Board {
+            squares,
+            en_passant: -1,
+            turn: Color::White,
+            castle_rights: [false, false, false, false],
+        }
     }
 
     pub fn place_piece(
@@ -94,6 +105,12 @@ impl Board {
             let new_file = ep_index % 8;
             self.en_passant = (new_file + new_rank * 8) as i8;
         }
+
+        let current_k = self.castle_rights[0];
+        let current_q = self.castle_rights[1];
+        let opp_k = self.castle_rights[2];
+        let opp_q = self.castle_rights[3];
+        self.castle_rights = [opp_k, opp_q, current_k, current_q];
 
         self.turn = self.turn.opposite();
     }
