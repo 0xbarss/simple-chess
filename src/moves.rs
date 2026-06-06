@@ -380,10 +380,7 @@ pub fn generate_pseudo_moves(board: &Board) -> Vec<Move> {
 
                             match squares[pos as usize] {
                                 Square::Empty(_) => {
-                                    // Castling
-                                    // These are not covered:
-                                    // King or Rook not played before
-                                    // No Check / No Threats to areas between king and rook
+                                    // Kingside Castle
                                     if dir == 2 && index == 4 && board.castle_rights[0] {
                                         if let Square::Occupied(piece) = squares[7] &&
                                            let Square::Empty(_) = squares[5] &&
@@ -397,22 +394,23 @@ pub fn generate_pseudo_moves(board: &Board) -> Vec<Move> {
                                             });
                                         }
                                     }
+                                    // Queenside Castle
                                     else if dir == -2 && index == 4 && board.castle_rights[1] {
-                                            if let Square::Occupied(piece) = squares[0] &&
-                                               let Square::Empty(_) = squares[1] &&
-                                               let Square::Empty(_) = squares[3] &&
-                                               piece.kind == PieceKind::Rook &&
-                                               piece.color == current_color
-                                            {
-                                                moves.push(Move {
-                                                    from: index,
-                                                    to: pos,
-                                                    flag: MoveFlag::CastleQueenside
-                                                });
-                                            }
+                                        if let Square::Occupied(piece) = squares[0] &&
+                                            let Square::Empty(_) = squares[1] &&
+                                            let Square::Empty(_) = squares[3] &&
+                                            piece.kind == PieceKind::Rook &&
+                                            piece.color == current_color
+                                        {
+                                            moves.push(Move {
+                                                from: index,
+                                                to: pos,
+                                                flag: MoveFlag::CastleQueenside
+                                            });
+                                        }
                                     }
+                                    // Quiet
                                     else if dir.abs() != 2 {
-                                        // Quiet
                                         moves.push(Move {
                                             from: index,
                                             to: pos,
