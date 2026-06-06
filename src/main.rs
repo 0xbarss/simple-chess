@@ -30,7 +30,7 @@ async fn main() {
     loop {
         clear_background(LIGHTGRAY);
 
-        renderer.draw_board();
+        renderer.draw_board(board.turn);
         renderer.draw_pieces(&board);
 
         if is_mouse_button_pressed(MouseButton::Left) {

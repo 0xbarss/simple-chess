@@ -1,4 +1,8 @@
-use macroquad::{color::Color, shapes::draw_rectangle, text::draw_text};
+use macroquad::color::Color;
+use macroquad::shapes::draw_rectangle;
+use macroquad::text::draw_text;
+
+use crate::pieces::Color as PieceColor;
 
 use super::Renderer;
 
@@ -10,10 +14,10 @@ const LIGHT_COLOR: Color = Color::from_rgba(240, 217, 181, 255);
 const DARK_COLOR: Color = Color::from_rgba(181, 136, 99, 255);
 
 impl Renderer<'_> {
-    pub fn draw_board(&self) {
+    pub fn draw_board(&self, turn: PieceColor) {
         for x in 0..8 {
             for y in 0..8 {
-                let is_light = (x + y) % 2 == 0;
+                let is_light = if turn == PieceColor::White { (x + y) % 2 == 0 } else { (x + y) % 2 == 1 };
                 let color = if is_light { LIGHT_COLOR } else { DARK_COLOR };
 
                 draw_rectangle(
