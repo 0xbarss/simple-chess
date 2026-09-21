@@ -1,0 +1,83 @@
+{
+  "tagline": "A modular 2D chess engine and game written in Rust using Macroquad",
+  "cover": "cover.png",
+  "highlights": [
+    "Full chess ruleset including castling with transit-attack guards, en passant, and pawn promotion",
+    "Two-tier deterministic move validator with zero-allocation test board simulation for king safety",
+    "Dynamic 180-degree hotseat board rotation for seamless two-player local pass-and-play",
+    "Hardware-accelerated 2D rendering pipeline using Macroquad texture atlases and vector overlays",
+    "Zero external chess dependencies written in idiomatic Rust 2024"
+  ],
+  "links": [
+    {
+      "label": "Source Code",
+      "url": "https://github.com/0xbarss/simple-chess"
+    },
+    {
+      "label": "Game Loop & Input",
+      "url": "https://github.com/0xbarss/simple-chess/blob/main/src/main.rs"
+    },
+    {
+      "label": "Move Generation",
+      "url": "https://github.com/0xbarss/simple-chess/blob/main/src/moves.rs"
+    },
+    {
+      "label": "Rules & Validation",
+      "url": "https://github.com/0xbarss/simple-chess/blob/main/src/rules.rs"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "body": "Building a chess engine requires balancing rule completeness with performance. Beyond basic piece movements, chess has subtle edge cases: pawns capturing diagonally on squares an opponent just skipped, kings hopping across rooks only when the intervening squares are unattacked, and pieces whose movements are pinned to protect their king. This project implements a complete, self-contained desktop chess game in Rust using Macroquad for hardware-accelerated 2D rendering."
+    },
+    {
+      "type": "image",
+      "src": "architecture.png",
+      "caption": "Figure 1: Modular engine pipeline separating OS input ingress, move validation, board state, and GPU blitting"
+    },
+    {
+      "type": "text",
+      "body": "The codebase is organized into four decoupled modules. The input system translates screen coordinates into board indices and tracks whether a square is currently selected. The validation engine generates pseudo-legal candidate moves and tests them against king safety. The board model holds a compact 64-square array, while the renderer draws board tiles, piece sprites, and visual indicators on each frame."
+    },
+    {
+      "type": "image",
+      "src": "move_validation_pipeline.png",
+      "caption": "Figure 2: Multi-stage move validation pipeline with raycasting, special rules, and hypothetical self-check verification"
+    },
+    {
+      "type": "text",
+      "body": "Move validation operates in two tiers. First, the engine generates pseudo-legal candidates by casting rays for sliding pieces (rooks, bishops, queens) and stepping offsets for knights and kings. Second, to verify king safety, the engine copies the board onto the stack, applies the candidate move, and queries whether the king remains attacked. If the move leaves the king in check, it is discarded. This eliminates invalid moves from pinned pieces without complex geometry checks."
+    },
+    {
+      "type": "image",
+      "src": "board_state_model.png",
+      "caption": "Figure 3: 64-square linear array indexing and dynamic 180-degree hotseat board rotation for local play"
+    },
+    {
+      "type": "text",
+      "body": "Board state is stored in a flat 64-element array indexed by file + rank * 8, avoiding dynamic heap allocation. For local two-player play, the engine implements in-place board rotation. After each turn, the board inverts its rank coordinates and swaps castling rights, allowing the active player to always view their own pieces from the bottom of the screen without camera matrix transformations."
+    },
+    {
+      "type": "image",
+      "src": "special_moves.png",
+      "caption": "Figure 4: Special move mechanics: castling transit safety, en passant capture, pawn promotion, and double pawn push"
+    },
+    {
+      "type": "text",
+      "body": "All special rules are handled explicitly. Castling validates that neither the king nor the chosen rook has moved, that the squares between them are unoccupied, and that neither the king's current square nor its transit square is attacked. En passant tracks the skipped square of any double-pushed pawn for exactly one half-move. Pawn promotion transforms pawns reaching the opposite edge into higher-value pieces."
+    },
+    {
+      "type": "gallery",
+      "images": [
+        "gameplay_board.png",
+        "check_state.png",
+        "texture_atlas.png"
+      ]
+    },
+    {
+      "type": "text",
+      "body": "Rendering uses a single 384x128 texture atlas containing all 12 piece sprites. By sampling fixed 64x64 sub-rectangles and centering them within 100-pixel squares, the engine minimizes GPU draw calls and texture swaps. Visual overlays draw square borders, legal move dots, and red check warnings directly onto the viewport at 60 FPS."
+    }
+  ]
+}
