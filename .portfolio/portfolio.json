@@ -1,6 +1,7 @@
 {
   "tagline": "A modular 2D chess engine and game written in Rust using Macroquad",
   "cover": "cover.png",
+  "coverAspectRatio": "1200 / 500",
   "highlights": [
     "Full chess ruleset including castling with transit-attack guards, en passant, and pawn promotion",
     "Two-tier deterministic move validator with zero-allocation test board simulation for king safety",
@@ -34,7 +35,10 @@
     {
       "type": "image",
       "src": "architecture.png",
-      "caption": "Figure 1: Modular engine pipeline separating OS input ingress, move validation, board state, and GPU blitting"
+      "caption": "Figure 1: Modular engine pipeline separating OS input ingress, move validation, board state, and GPU blitting",
+      "aspectRatio": "1200 / 640",
+      "width": 1200,
+      "height": 640
     },
     {
       "type": "text",
@@ -43,7 +47,10 @@
     {
       "type": "image",
       "src": "move_validation_pipeline.png",
-      "caption": "Figure 2: Multi-stage move validation pipeline with raycasting, special rules, and hypothetical self-check verification"
+      "caption": "Figure 2: Multi-stage move validation pipeline with raycasting, special rules, and hypothetical self-check verification",
+      "aspectRatio": "1200 / 620",
+      "width": 1200,
+      "height": 620
     },
     {
       "type": "text",
@@ -52,7 +59,10 @@
     {
       "type": "image",
       "src": "board_state_model.png",
-      "caption": "Figure 3: 64-square linear array indexing and dynamic 180-degree hotseat board rotation for local play"
+      "caption": "Figure 3: 64-square linear array indexing and dynamic 180-degree hotseat board rotation for local play",
+      "aspectRatio": "1200 / 620",
+      "width": 1200,
+      "height": 620
     },
     {
       "type": "text",
@@ -61,7 +71,10 @@
     {
       "type": "image",
       "src": "special_moves.png",
-      "caption": "Figure 4: Special move mechanics: castling transit safety, en passant capture, pawn promotion, and double pawn push"
+      "caption": "Figure 4: Special move mechanics: castling transit safety, en passant capture, pawn promotion, and double pawn push",
+      "aspectRatio": "1200 / 620",
+      "width": 1200,
+      "height": 620
     },
     {
       "type": "text",
